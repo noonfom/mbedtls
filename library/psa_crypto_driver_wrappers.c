@@ -45,6 +45,18 @@
 #endif /* PSA_CRYPTO_DRIVER_TEST */
 
 /* Repeat above block for each JSON-declared driver during autogeneration */
+
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+#ifndef PSA_CRYPTO_DRIVER_PRESENT
+#define PSA_CRYPTO_DRIVER_PRESENT
+#endif
+#ifndef PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT
+#define PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT
+#endif
+/* Change the path to fit your machine */
+#include "cc3xx.h"
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
+
 #endif /* MBEDTLS_PSA_CRYPTO_DRIVERS */
 
 /* Auto-generated values depending on which drivers are registered.
@@ -56,6 +68,17 @@
 #define PSA_CRYPTO_TRANSPARENT_TEST_DRIVER_ID (2)
 #define PSA_CRYPTO_OPAQUE_TEST_DRIVER_ID (3)
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+
+
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+#ifndef PSA_CRYPTO_DRIVER_PRESENT
+#define PSA_CRYPTO_DRIVER_PRESENT
+#endif
+#ifndef PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT
+#define PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT
+#endif
+#define PSA_CRYPTO_DRIVER_CC3XX_ID (4)
+#endif
 
 /* Support the 'old' SE interface when asked to */
 #if defined(MBEDTLS_PSA_CRYPTO_SE_C)
@@ -1219,7 +1242,12 @@ psa_status_t psa_driver_wrapper_hash_compute(
     if( status != PSA_ERROR_NOT_SUPPORTED )
         return( status );
 #endif
-
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+    status = cc3xx_hash_compute(alg, input, input_length, hash, hash_size,
+            hash_length);
+    if (status != PSA_ERROR_NOT_SUPPORTED)
+        return status;
+#endif
     /* If software fallback is compiled in, try fallback */
 #if defined(MBEDTLS_PSA_BUILTIN_HASH)
     status = mbedtls_psa_hash_compute( alg, input, input_length,
@@ -1253,6 +1281,16 @@ psa_status_t psa_driver_wrapper_hash_setup(
 
     if( status != PSA_ERROR_NOT_SUPPORTED )
         return( status );
+#endif
+
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+    status = cc3xx_hash_setup(&operation->ctx.cc3xx_driver_ctx, alg);
+    if( status == PSA_SUCCESS )
+        operation->id = PSA_CRYPTO_DRIVER_CC3XX_ID;
+
+    if( status != PSA_ERROR_NOT_SUPPORTED) {
+        return( status );
+    }
 #endif
 
     /* If software fallback is compiled in, try fallback */
@@ -1290,6 +1328,13 @@ psa_status_t psa_driver_wrapper_hash_clone(
                         &source_operation->ctx.test_driver_ctx,
                         &target_operation->ctx.test_driver_ctx ) );
 #endif
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_DRIVER_CC3XX_ID:
+            target_operation->id = PSA_CRYPTO_DRIVER_CC3XX_ID;
+            return( cc3xx_hash_clone(
+                        &source_operation->ctx.cc3xx_driver_ctx,
+                        &target_operation->ctx.cc3xx_driver_ctx ) );
+#endif
         default:
             (void) target_operation;
             return( PSA_ERROR_BAD_STATE );
@@ -1312,6 +1357,12 @@ psa_status_t psa_driver_wrapper_hash_update(
         case PSA_CRYPTO_TRANSPARENT_TEST_DRIVER_ID:
             return( mbedtls_test_transparent_hash_update(
                         &operation->ctx.test_driver_ctx,
+                        input, input_length ) );
+#endif
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_DRIVER_CC3XX_ID:
+            return( cc3xx_hash_update(
+                        &operation->ctx.cc3xx_driver_ctx,
                         input, input_length ) );
 #endif
         default:
@@ -1340,6 +1391,12 @@ psa_status_t psa_driver_wrapper_hash_finish(
                         &operation->ctx.test_driver_ctx,
                         hash, hash_size, hash_length ) );
 #endif
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_DRIVER_CC3XX_ID:
+            return( cc3xx_hash_finish(
+                        &operation->ctx.cc3xx_driver_ctx,
+                        hash, hash_size, hash_length ) );
+#endif
         default:
             (void) hash;
             (void) hash_size;
@@ -1361,6 +1418,11 @@ psa_status_t psa_driver_wrapper_hash_abort(
         case PSA_CRYPTO_TRANSPARENT_TEST_DRIVER_ID:
             return( mbedtls_test_transparent_hash_abort(
                         &operation->ctx.test_driver_ctx ) );
+#endif
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_DRIVER_CC3XX_ID:
+            return( cc3xx_hash_abort(
+                        &operation->ctx.cc3xx_driver_ctx ) );
 #endif
         default:
             return( PSA_ERROR_BAD_STATE );

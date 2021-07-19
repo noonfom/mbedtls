@@ -44,6 +44,18 @@
 #endif /* PSA_CRYPTO_DRIVER_TEST */
 
 /* Repeat above block for each JSON-declared driver during autogeneration */
+
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+#ifndef PSA_CRYPTO_DRIVER_PRESENT
+#define PSA_CRYPTO_DRIVER_PRESENT
+#endif
+#ifndef PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT
+#define PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT
+#endif
+/* Change the path to fit your machine */
+#include "cc3xx.h"
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
+
 #endif /* MBEDTLS_PSA_CRYPTO_DRIVERS */
 
 /* Auto-generated values depending on which drivers are registered.
@@ -57,14 +69,14 @@
 #endif /* PSA_CRYPTO_DRIVER_TEST */
 
 
-#if defined(PSA_CRYPTO_CC3XX_DRIVER)
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
 #ifndef PSA_CRYPTO_DRIVER_PRESENT
 #define PSA_CRYPTO_DRIVER_PRESENT
 #endif
 #ifndef PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT
 #define PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT
 #endif
-#define PSA_CRYPTO_CC3XX_DRIVER_ID (4)
+#define PSA_CRYPTO_DRIVER_CC3XX_ID (4)
 #endif
 
 /* Support the 'old' SE interface when asked to */
@@ -1265,10 +1277,10 @@ psa_status_t psa_driver_wrapper_hash_setup(
         return( status );
 #endif
 
-#if defined(PSA_CRYPTO_CC3XX_DRIVER)
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
     status = cc3xx_hash_setup(&operation->ctx.cc3xx_driver_ctx, alg);
     if( status == PSA_SUCCESS )
-        operation->id = PSA_CRYPTO_CC3XX_DRIVER_ID;
+        operation->id = PSA_CRYPTO_DRIVER_CC3XX_ID;
 
     if( status != PSA_ERROR_NOT_SUPPORTED) {
         return( status );
@@ -1310,9 +1322,9 @@ psa_status_t psa_driver_wrapper_hash_clone(
                         &source_operation->ctx.test_driver_ctx,
                         &target_operation->ctx.test_driver_ctx ) );
 #endif
-#if defined(PSA_CRYPTO_CC3XX_DRIVER)
-        case PSA_CRYPTO_CC3XX_DRIVER_ID:
-            target_operation->id = PSA_CRYPTO_CC3XX_DRIVER_ID;
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_DRIVER_CC3XX_ID:
+            target_operation->id = PSA_CRYPTO_DRIVER_CC3XX_ID;
             return( cc3xx_hash_clone(
                         &source_operation->ctx.cc3xx_driver_ctx,
                         &target_operation->ctx.cc3xx_driver_ctx ) );
@@ -1341,8 +1353,8 @@ psa_status_t psa_driver_wrapper_hash_update(
                         &operation->ctx.test_driver_ctx,
                         input, input_length ) );
 #endif
-#if defined(PSA_CRYPTO_CC3XX_DRIVER)
-        case PSA_CRYPTO_CC3XX_DRIVER_ID:
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_DRIVER_CC3XX_ID:
             return( cc3xx_hash_update(
                         &operation->ctx.cc3xx_driver_ctx,
                         input, input_length ) );
@@ -1373,8 +1385,8 @@ psa_status_t psa_driver_wrapper_hash_finish(
                         &operation->ctx.test_driver_ctx,
                         hash, hash_size, hash_length ) );
 #endif
-#if defined(PSA_CRYPTO_CC3XX_DRIVER)
-        case PSA_CRYPTO_CC3XX_DRIVER_ID:
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_DRIVER_CC3XX_ID:
             return( cc3xx_hash_finish(
                         &operation->ctx.cc3xx_driver_ctx,
                         hash, hash_size, hash_length ) );
@@ -1401,8 +1413,8 @@ psa_status_t psa_driver_wrapper_hash_abort(
             return( mbedtls_test_transparent_hash_abort(
                         &operation->ctx.test_driver_ctx ) );
 #endif
-#if defined(PSA_CRYPTO_CC3XX_DRIVER)
-        case PSA_CRYPTO_CC3XX_DRIVER_ID:
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_DRIVER_CC3XX_ID:
             return( cc3xx_hash_abort(
                         &operation->ctx.cc3xx_driver_ctx ) );
 #endif

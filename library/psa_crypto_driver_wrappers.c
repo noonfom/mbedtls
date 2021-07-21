@@ -43,8 +43,6 @@
 #include "test/drivers/test_driver.h"
 #endif /* PSA_CRYPTO_DRIVER_TEST */
 
-/* Repeat above block for each JSON-declared driver during autogeneration */
-
 #if defined(PSA_CRYPTO_DRIVER_CC3XX)
 #ifndef PSA_CRYPTO_DRIVER_PRESENT
 #define PSA_CRYPTO_DRIVER_PRESENT
@@ -52,10 +50,10 @@
 #ifndef PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT
 #define PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT
 #endif
-/* Change the path to fit your machine */
 #include "cc3xx.h"
 #endif /* PSA_CRYPTO_DRIVER_CC3XX */
 
+/* Repeat above block for each JSON-declared driver during autogeneration */
 #endif /* MBEDTLS_PSA_CRYPTO_DRIVERS */
 
 /* Auto-generated values depending on which drivers are registered.
@@ -68,16 +66,9 @@
 #define PSA_CRYPTO_OPAQUE_TEST_DRIVER_ID (3)
 #endif /* PSA_CRYPTO_DRIVER_TEST */
 
-
 #if defined(PSA_CRYPTO_DRIVER_CC3XX)
-#ifndef PSA_CRYPTO_DRIVER_PRESENT
-#define PSA_CRYPTO_DRIVER_PRESENT
-#endif
-#ifndef PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT
-#define PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT
-#endif
-#define PSA_CRYPTO_DRIVER_CC3XX_ID (4)
-#endif
+#define PSA_CRYPTO_CC3XX_DRIVER_ID (4)
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 
 /* Support the 'old' SE interface when asked to */
 #if defined(MBEDTLS_PSA_CRYPTO_SE_C)
@@ -952,6 +943,20 @@ psa_status_t psa_driver_wrapper_cipher_encrypt_setup(
             if( status != PSA_ERROR_NOT_SUPPORTED )
                 return( status );
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+            status = cc3xx_cipher_encrypt_setup(
+                &operation->ctx.cc3xx_driver_ctx,
+                attributes,
+                key_buffer,
+                key_buffer_size,
+                alg );
+            /* Declared with fallback == true */
+            if( status == PSA_SUCCESS )
+                operation->id = PSA_CRYPTO_CC3XX_DRIVER_ID;
+
+            if( status != PSA_ERROR_NOT_SUPPORTED )
+                return( status );
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
 #if defined(MBEDTLS_PSA_BUILTIN_CIPHER)
             /* Fell through, meaning no accelerator supports this operation */
@@ -1024,6 +1029,20 @@ psa_status_t psa_driver_wrapper_cipher_decrypt_setup(
             if( status != PSA_ERROR_NOT_SUPPORTED )
                 return( status );
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+            status = cc3xx_cipher_decrypt_setup(
+                &operation->ctx.cc3xx_driver_ctx,
+                attributes,
+                key_buffer,
+                key_buffer_size,
+                alg );
+            /* Declared with fallback == true */
+            if( status == PSA_SUCCESS )
+                operation->id = PSA_CRYPTO_CC3XX_DRIVER_ID;
+
+            if( status != PSA_ERROR_NOT_SUPPORTED )
+                return( status );
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
 #if defined(MBEDTLS_PSA_BUILTIN_CIPHER)
             /* Fell through, meaning no accelerator supports this operation */
@@ -1091,6 +1110,12 @@ psa_status_t psa_driver_wrapper_cipher_set_iv(
                         &operation->ctx.opaque_test_driver_ctx,
                         iv, iv_length ) );
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_CC3XX_DRIVER_ID:
+            return( cc3xx_cipher_set_iv(
+                        &operation->ctx.cc3xx_driver_ctx,
+                        iv, iv_length ) );
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
     }
 
@@ -1134,6 +1159,13 @@ psa_status_t psa_driver_wrapper_cipher_update(
                         input, input_length,
                         output, output_size, output_length ) );
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_CC3XX_DRIVER_ID:
+            return( cc3xx_cipher_update(
+                        &operation->ctx.cc3xx_driver_ctx,
+                        input, input_length,
+                        output, output_size, output_length ) );
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
     }
 
@@ -1174,6 +1206,12 @@ psa_status_t psa_driver_wrapper_cipher_finish(
                         &operation->ctx.opaque_test_driver_ctx,
                         output, output_size, output_length ) );
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_CC3XX_DRIVER_ID:
+            return( cc3xx_cipher_finish(
+                        &operation->ctx.cc3xx_driver_ctx,
+                        output, output_size, output_length ) );
+#endif /* PSA_CRYPTO_DRIVER_CC3XX*/
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
     }
 
@@ -1214,6 +1252,15 @@ psa_status_t psa_driver_wrapper_cipher_abort(
                 sizeof( operation->ctx.opaque_test_driver_ctx ) );
             return( status );
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_CC3XX_DRIVER_ID:
+            status = cc3xx_cipher_abort(
+                         &operation->ctx.cc3xx_driver_ctx );
+            mbedtls_platform_zeroize(
+                &operation->ctx.cc3xx_driver_ctx,
+                sizeof( operation->ctx.cc3xx_driver_ctx ) );
+            return( status );
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
     }
 
@@ -1280,12 +1327,12 @@ psa_status_t psa_driver_wrapper_hash_setup(
 #if defined(PSA_CRYPTO_DRIVER_CC3XX)
     status = cc3xx_hash_setup(&operation->ctx.cc3xx_driver_ctx, alg);
     if( status == PSA_SUCCESS )
-        operation->id = PSA_CRYPTO_DRIVER_CC3XX_ID;
+        operation->id = PSA_CRYPTO_CC3XX_DRIVER_ID;
 
     if( status != PSA_ERROR_NOT_SUPPORTED) {
         return( status );
     }
-#endif
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 
     /* If software fallback is compiled in, try fallback */
 #if defined(MBEDTLS_PSA_BUILTIN_HASH)
@@ -1323,12 +1370,12 @@ psa_status_t psa_driver_wrapper_hash_clone(
                         &target_operation->ctx.test_driver_ctx ) );
 #endif
 #if defined(PSA_CRYPTO_DRIVER_CC3XX)
-        case PSA_CRYPTO_DRIVER_CC3XX_ID:
-            target_operation->id = PSA_CRYPTO_DRIVER_CC3XX_ID;
+        case PSA_CRYPTO_CC3XX_DRIVER_ID:
+            target_operation->id = PSA_CRYPTO_CC3XX_DRIVER_ID;
             return( cc3xx_hash_clone(
                         &source_operation->ctx.cc3xx_driver_ctx,
                         &target_operation->ctx.cc3xx_driver_ctx ) );
-#endif
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
         default:
             (void) target_operation;
             return( PSA_ERROR_BAD_STATE );
@@ -1354,11 +1401,11 @@ psa_status_t psa_driver_wrapper_hash_update(
                         input, input_length ) );
 #endif
 #if defined(PSA_CRYPTO_DRIVER_CC3XX)
-        case PSA_CRYPTO_DRIVER_CC3XX_ID:
+        case PSA_CRYPTO_CC3XX_DRIVER_ID:
             return( cc3xx_hash_update(
                         &operation->ctx.cc3xx_driver_ctx,
                         input, input_length ) );
-#endif
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
         default:
             (void) input;
             (void) input_length;
@@ -1386,11 +1433,11 @@ psa_status_t psa_driver_wrapper_hash_finish(
                         hash, hash_size, hash_length ) );
 #endif
 #if defined(PSA_CRYPTO_DRIVER_CC3XX)
-        case PSA_CRYPTO_DRIVER_CC3XX_ID:
+        case PSA_CRYPTO_CC3XX_DRIVER_ID:
             return( cc3xx_hash_finish(
                         &operation->ctx.cc3xx_driver_ctx,
                         hash, hash_size, hash_length ) );
-#endif
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
         default:
             (void) hash;
             (void) hash_size;
@@ -1414,10 +1461,10 @@ psa_status_t psa_driver_wrapper_hash_abort(
                         &operation->ctx.test_driver_ctx ) );
 #endif
 #if defined(PSA_CRYPTO_DRIVER_CC3XX)
-        case PSA_CRYPTO_DRIVER_CC3XX_ID:
+        case PSA_CRYPTO_CC3XX_DRIVER_ID:
             return( cc3xx_hash_abort(
                         &operation->ctx.cc3xx_driver_ctx ) );
-#endif
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
         default:
             return( PSA_ERROR_BAD_STATE );
     }

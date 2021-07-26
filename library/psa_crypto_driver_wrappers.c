@@ -1323,6 +1323,7 @@ psa_status_t psa_driver_wrapper_hash_compute(
     if (status != PSA_ERROR_NOT_SUPPORTED)
         return status;
 #endif
+
     /* If software fallback is compiled in, try fallback */
 #if defined(MBEDTLS_PSA_BUILTIN_HASH)
     status = mbedtls_psa_hash_compute( alg, input, input_length,
@@ -1642,6 +1643,14 @@ psa_status_t psa_driver_wrapper_mac_compute(
             if( status != PSA_ERROR_NOT_SUPPORTED )
                 return( status );
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+            status = cc3xx_mac_compute(attributes, key_buffer, key_buffer_size, alg,
+                input, input_length,
+                mac, mac_size, mac_length);
+            /* Declared with fallback == true */
+            if( status != PSA_ERROR_NOT_SUPPORTED )
+                return( status );
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
 #if defined(MBEDTLS_PSA_BUILTIN_MAC)
             /* Fell through, meaning no accelerator supports this operation */
@@ -1710,6 +1719,17 @@ psa_status_t psa_driver_wrapper_mac_sign_setup(
             if( status != PSA_ERROR_NOT_SUPPORTED )
                 return( status );
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+            status = cc3xx_mac_sign_setup(
+                    &operation->ctx.cc3xx_driver_ctx,
+                    attributes,
+                    key_buffer, key_buffer_size,
+                    alg);
+            if (status == PSA_SUCCESS)
+                operation->id = PSA_CRYPTO_CC3XX_DRIVER_ID;
+            if (status != PSA_ERROR_NOT_SUPPORTED)
+                return status;
+#endif
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
 #if defined(MBEDTLS_PSA_BUILTIN_MAC)
             /* Fell through, meaning no accelerator supports this operation */
@@ -1781,6 +1801,17 @@ psa_status_t psa_driver_wrapper_mac_verify_setup(
             if( status != PSA_ERROR_NOT_SUPPORTED )
                 return( status );
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+            status = cc3xx_mac_verify_setup(
+                &operation->ctx.cc3xx_driver_ctx,
+                attributes,
+                key_buffer, key_buffer_size,
+                alg);
+            if (status == PSA_SUCCESS)
+                operation->id = PSA_CRYPTO_CC3XX_DRIVER_ID;
+            if (status != PSA_ERROR_NOT_SUPPORTED)
+                return status;
+#endif
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
 #if defined(MBEDTLS_PSA_BUILTIN_MAC)
             /* Fell through, meaning no accelerator supports this operation */
@@ -1847,6 +1878,10 @@ psa_status_t psa_driver_wrapper_mac_update(
                         &operation->ctx.opaque_test_driver_ctx,
                         input, input_length ) );
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_CC3XX_DRIVER_ID:
+            return(cc3xx_mac_update(&operation->ctx.cc3xx_driver_ctx, input, input_length));
+#endif
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
         default:
             (void) input;
@@ -1881,6 +1916,11 @@ psa_status_t psa_driver_wrapper_mac_sign_finish(
                         &operation->ctx.opaque_test_driver_ctx,
                         mac, mac_size, mac_length ) );
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_CC3XX_DRIVER_ID:
+            return(cc3xx_mac_sign_finish(&operation->ctx.cc3xx_driver_ctx,
+                        mac, mac_size, mac_length));
+#endif
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
         default:
             (void) mac;
@@ -1915,6 +1955,12 @@ psa_status_t psa_driver_wrapper_mac_verify_finish(
                         &operation->ctx.opaque_test_driver_ctx,
                         mac, mac_length ) );
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_CC3XX_DRIVER_ID:
+            return(cc3xx_mac_verify_finish(
+                        &operation->ctx.cc3xx_driver_ctx,
+                        mac, mac_length));
+#endif
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
         default:
             (void) mac;
@@ -1942,6 +1988,10 @@ psa_status_t psa_driver_wrapper_mac_abort(
             return( mbedtls_test_opaque_mac_abort(
                         &operation->ctx.opaque_test_driver_ctx ) );
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_CC3XX_DRIVER_ID:
+            return(cc3xx_mac_abort(&operation->ctx.cc3xx_driver_ctx));
+#endif
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
         default:
             return( PSA_ERROR_INVALID_ARGUMENT );

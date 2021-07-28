@@ -1288,7 +1288,12 @@ psa_status_t psa_driver_wrapper_hash_compute(
     if( status != PSA_ERROR_NOT_SUPPORTED )
         return( status );
 #endif
-
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+    status = cc3xx_hash_compute(alg, input, input_length, hash, hash_size,
+            hash_length);
+    if (status != PSA_ERROR_NOT_SUPPORTED)
+        return status;
+#endif
     /* If software fallback is compiled in, try fallback */
 #if defined(MBEDTLS_PSA_BUILTIN_HASH)
     status = mbedtls_psa_hash_compute( alg, input, input_length,

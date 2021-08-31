@@ -417,6 +417,22 @@ psa_status_t psa_sign_message_builtin(
     psa_algorithm_t alg, const uint8_t *input, size_t input_length,
     uint8_t *signature, size_t signature_size, size_t *signature_length );
 
+psa_status_t psa_asymmetric_encrypt_builtin(const psa_key_attributes_t *attributes,
+                                const uint8_t *key_buffer,
+                                size_t key_buffer_size, psa_algorithm_t alg,
+                                const uint8_t *input, size_t input_length,
+                                const uint8_t *salt, size_t salt_length,
+                                uint8_t *output, size_t output_size,
+                                size_t *output_length);
+
+psa_status_t psa_asymmetric_decrypt_builtin(const psa_key_attributes_t *attributes,
+                                const uint8_t *key_buffer,
+                                size_t key_buffer_size, psa_algorithm_t alg,
+                                const uint8_t *input, size_t input_length,
+                                const uint8_t *salt, size_t salt_length,
+                                uint8_t *output, size_t output_size,
+                                size_t *output_length);
+
 /** Verify the signature of a message with a public key, using
  *  a hash-and-sign verification algorithm.
  *

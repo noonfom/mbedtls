@@ -1998,4 +1998,74 @@ psa_status_t psa_driver_wrapper_mac_abort(
     }
 }
 
+/*
+ * Asymmetric operations
+ */
+psa_status_t psa_driver_wrapper_asymmetric_encrypt(const psa_key_attributes_t *attributes,
+                                const uint8_t *key_buffer,
+                                size_t key_buffer_size, psa_algorithm_t alg,
+                                const uint8_t *input, size_t input_length,
+                                const uint8_t *salt, size_t salt_length,
+                                uint8_t *output, size_t output_size,
+                                size_t *output_length) {
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+    psa_key_location_t location =
+        PSA_KEY_LIFETIME_GET_LOCATION( attributes->core.lifetime );
+
+    switch( location )
+    {
+        case PSA_KEY_LOCATION_LOCAL_STORAGE:
+            /* Key is stored in the slot in export representation, so
+             * cycle through all known transparent accelerators */
+#if defined(PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT)
+#if defined(PSA_CRYPTO_CC3XX_DRIVER)
+            status = cc3xx_asym_encrypt(attributes, key_buffer, key_buffer_size, alg, input, input_length, salt, salt_length, output, output_size, output_length)
+            if (status != PSA_ERROR_NOT_SUPPORTED) {
+                return status;
+            }
+#endif
+#endif
+            break;
+        default:
+            /* Key is declared with a lifetime not known to us */
+            (void)status;
+            break;
+    }
+    return psa_asymmetric_encrypt_builtin(attributes, key_buffer, key_buffer_size, alg, input, input_length, salt, salt_length, output, output_size, output_length);
+}
+
+psa_status_t psa_driver_wrapper_asymmetric_decrypt(const psa_key_attributes_t *attributes,
+                                const uint8_t *key_buffer,
+                                size_t key_buffer_size, psa_algorithm_t alg,
+                                const uint8_t *input, size_t input_length,
+                                const uint8_t *salt, size_t salt_length,
+                                uint8_t *output, size_t output_size,
+                                size_t *output_length) {
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+    psa_key_location_t location =
+        PSA_KEY_LIFETIME_GET_LOCATION( attributes->core.lifetime );
+
+    switch( location )
+    {
+        case PSA_KEY_LOCATION_LOCAL_STORAGE:
+            /* Key is stored in the slot in export representation, so
+             * cycle through all known transparent accelerators */
+#if defined(PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT)
+#if defined(PSA_CRYPTO_CC3XX_DRIVER)
+            status = cc3xx_asym_decrypt(attributes, key_buffer, key_buffer_size, alg, input, input_length, salt, salt_length, output, output_size, output_length)
+            if (status != PSA_ERROR_NOT_SUPPORTED) {
+                return status;
+            }
+#endif
+#endif
+            break;
+        default:
+            /* Key is declared with a lifetime not known to us */
+            (void)status;
+            break;
+    }
+    return psa_asymmetric_decrypt_builtin(attributes, key_buffer, key_buffer_size, alg, input, input_length, salt, salt_length, output, output_size, output_length);
+
+}
+
 #endif /* MBEDTLS_PSA_CRYPTO_C */

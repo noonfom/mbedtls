@@ -56,6 +56,11 @@
 #define MBEDTLS_PSA_BUILTIN_HASH
 #endif
 
+#if defined(MBEDTLS_PSA_BUILTIN_ALG_RSA_OAEP) || \
+    defined(MBEDTLS_PSA_BUILTIN_ALG_RSA_PKCS1V15_CRYPT)
+#define MBEDTLS_PSA_BUILTIN_ASYMMETRIC_ENCRYPTION
+#endif
+
 typedef struct
 {
     psa_algorithm_t MBEDTLS_PRIVATE(alg);

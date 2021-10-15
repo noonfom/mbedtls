@@ -3850,6 +3850,9 @@ psa_status_t psa_aead_encrypt_setup( psa_aead_operation_t *operation,
                                      mbedtls_svc_key_id_t key,
                                      psa_algorithm_t alg )
 {
+    /* DEBUG: Remove this when CCM support is properly merged into mbedTLS! */
+    if (alg != PSA_ALG_GCM)
+      return PSA_ERROR_NOT_SUPPORTED;
     return( psa_aead_setup( operation, 1, key, alg ) );
 }
 
@@ -3858,6 +3861,9 @@ psa_status_t psa_aead_decrypt_setup( psa_aead_operation_t *operation,
                                      mbedtls_svc_key_id_t key,
                                      psa_algorithm_t alg )
 {
+    /* DEBUG: Remove this when CCM support is properly merged into mbedTLS! */
+    if (alg != PSA_ALG_GCM)
+      return PSA_ERROR_NOT_SUPPORTED;
     return( psa_aead_setup( operation, 0, key, alg ) );
 }
 

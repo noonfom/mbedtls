@@ -103,6 +103,21 @@ psa_status_t psa_driver_wrapper_sign_message(
             /* Key is stored in the slot in export representation, so
              * cycle through all known transparent accelerators */
 #if defined(PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT)
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+            status = cc3xx_sign_message(
+                        attributes,
+                        key_buffer,
+                        key_buffer_size,
+                        alg,
+                        input,
+                        input_length,
+                        signature,
+                        signature_size,
+                        signature_length );
+            /* Declared with fallback == true */
+            if( status != PSA_ERROR_NOT_SUPPORTED )
+                return( status );
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #if defined(PSA_CRYPTO_DRIVER_TEST)
             status = mbedtls_test_transparent_signature_sign_message(
                         attributes,
@@ -177,6 +192,20 @@ psa_status_t psa_driver_wrapper_verify_message(
             /* Key is stored in the slot in export representation, so
              * cycle through all known transparent accelerators */
 #if defined(PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT)
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+            status = cc3xx_verify_message(
+                        attributes,
+                        key_buffer,
+                        key_buffer_size,
+                        alg,
+                        input,
+                        input_length,
+                        signature,
+                        signature_length );
+            /* Declared with fallback == true */
+            if( status != PSA_ERROR_NOT_SUPPORTED )
+                return( status );
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #if defined(PSA_CRYPTO_DRIVER_TEST)
             status = mbedtls_test_transparent_signature_verify_message(
                         attributes,
@@ -264,6 +293,20 @@ psa_status_t psa_driver_wrapper_sign_hash(
             /* Key is stored in the slot in export representation, so
              * cycle through all known transparent accelerators */
 #if defined(PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT)
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+            status = cc3xx_sign_hash( attributes,
+                                      key_buffer,
+                                      key_buffer_size,
+                                      alg,
+                                      hash,
+                                      hash_length,
+                                      signature,
+                                      signature_size,
+                                      signature_length );
+            /* Declared with fallback == true */
+            if( status != PSA_ERROR_NOT_SUPPORTED )
+                return( status );
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #if defined(PSA_CRYPTO_DRIVER_TEST)
             status = mbedtls_test_transparent_signature_sign_hash( attributes,
                                                            key_buffer,
@@ -348,6 +391,19 @@ psa_status_t psa_driver_wrapper_verify_hash(
             /* Key is stored in the slot in export representation, so
              * cycle through all known transparent accelerators */
 #if defined(PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT)
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+            status = cc3xx_verify_hash( attributes,
+                                        key_buffer,
+                                        key_buffer_size,
+                                        alg,
+                                        hash,
+                                        hash_length,
+                                        signature,
+                                        signature_length );
+            /* Declared with fallback == true */
+            if( status != PSA_ERROR_NOT_SUPPORTED )
+                return( status );
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #if defined(PSA_CRYPTO_DRIVER_TEST)
             status = mbedtls_test_transparent_signature_verify_hash(
                          attributes,
@@ -481,6 +537,14 @@ psa_status_t psa_driver_wrapper_generate_key(
             if( PSA_KEY_TYPE_IS_ASYMMETRIC( attributes->core.type ) )
             {
             /* Cycle through all known transparent accelerators */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+            status = cc3xx_generate_key(
+                attributes, key_buffer, key_buffer_size,
+                key_buffer_length );
+            /* Declared with fallback == true */
+            if( status != PSA_ERROR_NOT_SUPPORTED )
+                break;
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #if defined(PSA_CRYPTO_DRIVER_TEST)
                 status = mbedtls_test_transparent_generate_key(
                     attributes, key_buffer, key_buffer_size,
@@ -684,6 +748,18 @@ psa_status_t psa_driver_wrapper_export_public_key(
             /* Key is stored in the slot in export representation, so
              * cycle through all known transparent accelerators */
 #if defined(PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT)
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+            status = cc3xx_export_public_key(
+                         attributes,
+                         key_buffer,
+                         key_buffer_size,
+                         data,
+                         data_size,
+                         data_length );
+            /* Declared with fallback == true */
+            if( status != PSA_ERROR_NOT_SUPPORTED )
+                return( status );
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #if defined(PSA_CRYPTO_DRIVER_TEST)
             status = mbedtls_test_transparent_export_public_key(
                          attributes,

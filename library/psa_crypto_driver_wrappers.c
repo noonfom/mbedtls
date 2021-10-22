@@ -2577,27 +2577,32 @@ psa_status_t psa_driver_wrapper_key_agreement(
         uint8_t *output, size_t output_size, size_t *output_length,
         psa_algorithm_t alg )
 {
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+
     psa_key_location_t location =
             PSA_KEY_LIFETIME_GET_LOCATION( attributes->core.lifetime );
 
     switch( location )
     {
-    case PSA_KEY_LOCATION_LOCAL_STORAGE:
-        /* Key is stored in the slot in export representation, so
-         * cycle through all known transparent accelerators */
+        case PSA_KEY_LOCATION_LOCAL_STORAGE:
+            /* Key is stored in the slot in export representation, so
+             * cycle through all known transparent accelerators */
 #if defined(PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT)
 #if defined(PSA_CRYPTO_DRIVER_CC3XX)
-        return cc3xx_key_agreement( attributes,
-                                    priv_key,
-                                    priv_key_size,
-                                    publ_key,
-                                    publ_key_size,
-                                    output,
-                                    output_size,
-                                    output_length,
-                                    alg );
+            status = cc3xx_key_agreement( attributes,
+                                          priv_key,
+                                          priv_key_size,
+                                          publ_key,
+                                          publ_key_size,
+                                          output,
+                                          output_size,
+                                          output_length,
+                                          alg );
+            return( status );
 #endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
+            (void) status;
+            return ( PSA_ERROR_NOT_SUPPORTED );
     default:
         /* Key is declared with a lifetime not known to us */
         (void) priv_key;
@@ -2609,7 +2614,116 @@ psa_status_t psa_driver_wrapper_key_agreement(
         (void) output_length;
         (void) alg;
 
-        return( PSA_ERROR_NOT_SUPPORTED );
+        return( PSA_ERROR_INVALID_ARGUMENT );
+    }
+}
+
+/*
+ * Asymmetric operations
+ */
+psa_status_t psa_driver_wrapper_asymmetric_encrypt(const psa_key_attributes_t *attributes,
+                                const uint8_t *key_buffer,
+                                size_t key_buffer_size, psa_algorithm_t alg,
+                                const uint8_t *input, size_t input_length,
+                                const uint8_t *salt, size_t salt_length,
+                                uint8_t *output, size_t output_size,
+                                size_t *output_length)
+{
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+
+    psa_key_location_t location =
+        PSA_KEY_LIFETIME_GET_LOCATION( attributes->core.lifetime );
+
+    switch( location )
+    {
+        case PSA_KEY_LOCATION_LOCAL_STORAGE:
+            /* Key is stored in the slot in export representation, so
+             * cycle through all known transparent accelerators */
+#if defined(PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT)
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+            status = cc3xx_asymmetric_encrypt( attributes,
+                                               key_buffer,
+                                               key_buffer_size,
+                                               alg,
+                                               input,
+                                               input_length,
+                                               salt,
+                                               salt_length,
+                                               output,
+                                               output_size,
+                                               output_length );
+            return( status );
+#endif  /* PSA_CRYPTO_DRIVER_CC3XX */
+#endif  /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
+            (void) status;
+            return ( PSA_ERROR_NOT_SUPPORTED );
+        default:
+            /* Key is declared with a lifetime not known to us */
+            (void) key_buffer;
+            (void) key_buffer_size;
+            (void) alg;
+            (void) input;
+            (void) input_length;
+            (void) salt;
+            (void) salt_length;
+            (void) output;
+            (void) output_size;
+            (void) output_length;
+
+            return( PSA_ERROR_INVALID_ARGUMENT );
+    }
+}
+
+psa_status_t psa_driver_wrapper_asymmetric_decrypt(const psa_key_attributes_t *attributes,
+                                const uint8_t *key_buffer,
+                                size_t key_buffer_size, psa_algorithm_t alg,
+                                const uint8_t *input, size_t input_length,
+                                const uint8_t *salt, size_t salt_length,
+                                uint8_t *output, size_t output_size,
+                                size_t *output_length)
+{
+    psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+
+    psa_key_location_t location =
+        PSA_KEY_LIFETIME_GET_LOCATION( attributes->core.lifetime );
+
+    switch( location )
+    {
+        case PSA_KEY_LOCATION_LOCAL_STORAGE:
+            /* Key is stored in the slot in export representation, so
+             * cycle through all known transparent accelerators */
+#if defined(PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT)
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+            status = cc3xx_asymmetric_decrypt( attributes,
+                                               key_buffer,
+                                               key_buffer_size,
+                                               alg,
+                                               input,
+                                               input_length,
+                                               salt,
+                                               salt_length,
+                                               output,
+                                               output_size,
+                                               output_length );
+            return( status );
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
+#endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
+            (void) status;
+            return( PSA_ERROR_NOT_SUPPORTED );
+        default:
+            /* Key is declared with a lifetime not known to us */
+            (void) key_buffer;
+            (void) key_buffer_size;
+            (void) alg;
+            (void) input;
+            (void) input_length;
+            (void) salt;
+            (void) salt_length;
+            (void) output;
+            (void) output_size;
+            (void) output_length;
+
+            return( PSA_ERROR_INVALID_ARGUMENT );
     }
 }
 

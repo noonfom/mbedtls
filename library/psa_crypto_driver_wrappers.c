@@ -862,15 +862,15 @@ psa_status_t psa_driver_wrapper_cipher_encrypt(
                 return( status );
 #endif /* PSA_CRYPTO_DRIVER_TEST */
 #if defined(PSA_CRYPTO_DRIVER_CC3XX)
-            status = cc3xx_psa_cipher_encrypt( attributes,
-                                               key_buffer,
-                                               key_buffer_size,
-                                               alg,
-                                               input,
-                                               input_length,
-                                               output,
-                                               output_size,
-                                               output_length );
+            status = cc3xx_cipher_encrypt( attributes,
+                                           key_buffer,
+                                           key_buffer_size,
+                                           alg,
+                                           input,
+                                           input_length,
+                                           output,
+                                           output_size,
+                                           output_length );
             /* Declared with fallback == true */
             if( status != PSA_ERROR_NOT_SUPPORTED )
                 return( status );
@@ -958,15 +958,15 @@ psa_status_t psa_driver_wrapper_cipher_decrypt(
                 return( status );
 #endif /* PSA_CRYPTO_DRIVER_TEST */
 #if defined(PSA_CRYPTO_DRIVER_CC3XX)
-            status = cc3xx_psa_cipher_decrypt( attributes,
-                                               key_buffer,
-                                               key_buffer_size,
-                                               alg,
-                                               input,
-                                               input_length,
-                                               output,
-                                               output_size,
-                                               output_length );
+            status = cc3xx_cipher_decrypt( attributes,
+                                           key_buffer,
+                                           key_buffer_size,
+                                           alg,
+                                           input,
+                                           input_length,
+                                           output,
+                                           output_size,
+                                           output_length );
             /* Declared with fallback == true */
             if( status != PSA_ERROR_NOT_SUPPORTED )
                 return( status );

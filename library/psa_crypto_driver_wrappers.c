@@ -1831,6 +1831,17 @@ psa_status_t psa_driver_wrapper_aead_encrypt_setup(
             if( status != PSA_ERROR_NOT_SUPPORTED )
                 return( status );
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+            operation->id = PSA_CRYPTO_CC3XX_DRIVER_ID;
+            status = cc3xx_aead_encrypt_setup(
+                    &operation->ctx.cc3xx_driver_ctx,
+                    attributes, key_buffer, key_buffer_size,
+                    alg );
+
+            /* Declared with fallback == true */
+            if( status != PSA_ERROR_NOT_SUPPORTED )
+                return( status );
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
 
             /* Fell through, meaning no accelerator supports this operation */
@@ -1880,6 +1891,18 @@ psa_status_t psa_driver_wrapper_aead_decrypt_setup(
             if( status != PSA_ERROR_NOT_SUPPORTED )
                 return( status );
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+            operation->id = PSA_CRYPTO_CC3XX_DRIVER_ID;
+            status = cc3xx_aead_decrypt_setup(
+                    &operation->ctx.cc3xx_driver_ctx,
+                    attributes,
+                    key_buffer, key_buffer_size,
+                    alg );
+
+            /* Declared with fallback == true */
+            if( status != PSA_ERROR_NOT_SUPPORTED )
+                return( status );
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
 
             /* Fell through, meaning no accelerator supports this operation */
@@ -1926,6 +1949,15 @@ psa_status_t psa_driver_wrapper_aead_set_nonce(
         /* Add cases for opaque driver here */
 
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_CC3XX_DRIVER_ID:
+            return( cc3xx_aead_set_nonce(
+                    &operation->ctx.cc3xx_driver_ctx,
+                    nonce, nonce_length ) );
+
+            /* Add cases for opaque driver here */
+
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
     }
 
@@ -1960,6 +1992,15 @@ psa_status_t psa_driver_wrapper_aead_set_lengths(
         /* Add cases for opaque driver here */
 
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_CC3XX_DRIVER_ID:
+            return( cc3xx_aead_set_lengths(
+                    &operation->ctx.cc3xx_driver_ctx,
+                    ad_length, plaintext_length ) );
+
+        /* Add cases for opaque driver here */
+
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
     }
 
@@ -1994,6 +2035,15 @@ psa_status_t psa_driver_wrapper_aead_update_ad(
         /* Add cases for opaque driver here */
 
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_CC3XX_DRIVER_ID:
+            return( cc3xx_aead_update_ad(
+                    &operation->ctx.cc3xx_driver_ctx,
+                    input, input_length ) );
+
+            /* Add cases for opaque driver here */
+
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
     }
 
@@ -2033,6 +2083,16 @@ psa_status_t psa_driver_wrapper_aead_update(
         /* Add cases for opaque driver here */
 
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_CC3XX_DRIVER_ID:
+            return( cc3xx_aead_update(
+                    &operation->ctx.cc3xx_driver_ctx,
+                    input, input_length, output, output_size,
+                    output_length ) );
+
+            /* Add cases for opaque driver here */
+
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
     }
 
@@ -2077,6 +2137,16 @@ psa_status_t psa_driver_wrapper_aead_finish(
         /* Add cases for opaque driver here */
 
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_CC3XX_DRIVER_ID:
+            return( cc3xx_aead_finish(
+                    &operation->ctx.cc3xx_driver_ctx,
+                    ciphertext, ciphertext_size,
+                    ciphertext_length, tag, tag_size, tag_length ) );
+
+            /* Add cases for opaque driver here */
+
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
     }
 
@@ -2141,6 +2211,16 @@ psa_status_t psa_driver_wrapper_aead_verify(
         /* Add cases for opaque driver here */
 
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+        case PSA_CRYPTO_CC3XX_DRIVER_ID:
+            return( cc3xx_aead_verify(
+                    &operation->ctx.cc3xx_driver_ctx,
+                    plaintext, plaintext_size,
+                    plaintext_length, tag, tag_length ) );
+
+            /* Add cases for opaque driver here */
+
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
     }
 
@@ -2173,6 +2253,14 @@ psa_status_t psa_driver_wrapper_aead_abort(
         /* Add cases for opaque driver here */
 
 #endif /* PSA_CRYPTO_DRIVER_TEST */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+    case PSA_CRYPTO_CC3XX_DRIVER_ID:
+        return( cc3xx_aead_abort(
+                &operation->ctx.cc3xx_driver_ctx ) );
+
+        /* Add cases for opaque driver here */
+
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
     }
 

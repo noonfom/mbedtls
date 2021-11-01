@@ -70,6 +70,9 @@ typedef union {
 #if defined(PSA_CRYPTO_DRIVER_TEST)
     mbedtls_transparent_test_driver_aead_operation_t transparent_test_driver_ctx;
 #endif
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+    cc3xx_aead_operation_t cc3xx_driver_ctx;
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 } psa_driver_aead_context_t;
 
 #endif /* PSA_CRYPTO_DRIVER_CONTEXTS_COMPOSITES_H */

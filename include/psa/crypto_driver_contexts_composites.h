@@ -39,7 +39,7 @@
 /* Include the context structure definitions for those drivers that were
  * declared during the autogeneration process. */
 #if defined(PSA_CRYPTO_DRIVER_CC3XX)
-#include "cc3xx_crypto_primitives.h"
+#include "cc3xx_crypto_primitives_private.h"
 #endif
 
 /* Include the context structure definitions for the Mbed TLS software drivers */

@@ -3669,7 +3669,7 @@ static psa_status_t psa_aead_check_nonce_length( psa_algorithm_t alg,
 {
     psa_algorithm_t base_alg = psa_aead_get_base_algorithm( alg );
 
-    switch(base_alg)
+    switch( base_alg )
     {
 #if defined(PSA_WANT_ALG_GCM)
         case PSA_ALG_GCM:
@@ -3693,13 +3693,13 @@ static psa_status_t psa_aead_check_nonce_length( psa_algorithm_t alg,
         case PSA_ALG_CHACHA20_POLY1305:
             if( nonce_length == 12 )
                 return( PSA_SUCCESS );
-            else if( nonce_length == 8 )
-                return( PSA_ERROR_NOT_SUPPORTED );
             break;
 #endif /* PSA_WANT_ALG_CHACHA20_POLY1305 */
         default:
-            return( PSA_ERROR_NOT_SUPPORTED );
+            break;
     }
+    return( PSA_ERROR_NOT_SUPPORTED );
+}
 
     return( PSA_ERROR_INVALID_ARGUMENT );
 }
@@ -3885,6 +3885,9 @@ psa_status_t psa_aead_encrypt_setup( psa_aead_operation_t *operation,
                                      mbedtls_svc_key_id_t key,
                                      psa_algorithm_t alg )
 {
+    /* DEBUG: Remove this when CCM support is properly merged into mbedTLS! */
+    if (alg != PSA_ALG_GCM)
+      return PSA_ERROR_NOT_SUPPORTED;
     return( psa_aead_setup( operation, 1, key, alg ) );
 }
 
@@ -3893,6 +3896,9 @@ psa_status_t psa_aead_decrypt_setup( psa_aead_operation_t *operation,
                                      mbedtls_svc_key_id_t key,
                                      psa_algorithm_t alg )
 {
+    /* DEBUG: Remove this when CCM support is properly merged into mbedTLS! */
+    if (alg != PSA_ALG_GCM)
+      return PSA_ERROR_NOT_SUPPORTED;
     return( psa_aead_setup( operation, 0, key, alg ) );
 }
 
@@ -4010,8 +4016,6 @@ psa_status_t psa_aead_set_lengths( psa_aead_operation_t *operation,
         goto exit;
     }
 
-    switch(operation->alg)
-    {
 #if defined(PSA_WANT_ALG_GCM)
         case PSA_ALG_GCM:
             /* Lengths can only be too large for GCM if size_t is bigger than 32
@@ -4041,9 +4045,6 @@ psa_status_t psa_aead_set_lengths( psa_aead_operation_t *operation,
             /* No length restrictions for ChaChaPoly. */
             break;
 #endif /* PSA_WANT_ALG_CHACHA20_POLY1305 */
-        default:
-            break;
-    }
 
     status = psa_driver_wrapper_aead_set_lengths( operation, ad_length,
                                                   plaintext_length );

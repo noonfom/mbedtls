@@ -38,6 +38,9 @@
 
 /* Include the context structure definitions for those drivers that were
  * declared during the autogeneration process. */
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+#include "cc3xx_crypto_primitives_private.h"
+#endif
 
 /* Include the context structure definitions for the Mbed TLS software drivers */
 #include "psa/crypto_builtin_composites.h"
@@ -56,6 +59,9 @@ typedef union {
     mbedtls_transparent_test_driver_mac_operation_t transparent_test_driver_ctx;
     mbedtls_opaque_test_driver_mac_operation_t opaque_test_driver_ctx;
 #endif
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+    cc3xx_mac_operation_t cc3xx_driver_ctx;
+#endif
 } psa_driver_mac_context_t;
 
 typedef union {
@@ -64,6 +70,9 @@ typedef union {
 #if defined(PSA_CRYPTO_DRIVER_TEST)
     mbedtls_transparent_test_driver_aead_operation_t transparent_test_driver_ctx;
 #endif
+#if defined(PSA_CRYPTO_DRIVER_CC3XX)
+    cc3xx_aead_operation_t cc3xx_driver_ctx;
+#endif /* PSA_CRYPTO_DRIVER_CC3XX */
 } psa_driver_aead_context_t;
 
 #endif /* PSA_CRYPTO_DRIVER_CONTEXTS_COMPOSITES_H */

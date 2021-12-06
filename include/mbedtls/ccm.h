@@ -57,8 +57,12 @@
 #define MBEDTLS_CCM_STAR_DECRYPT  2
 #define MBEDTLS_CCM_STAR_ENCRYPT  3
 
-#define MBEDTLS_ERR_CCM_BAD_INPUT       -0x000D /**< Bad input parameters to the function. */
-#define MBEDTLS_ERR_CCM_AUTH_FAILED     -0x000F /**< Authenticated decryption failed. */
+/** Bad input parameters to the function. */
+#define MBEDTLS_ERR_CCM_BAD_INPUT       -0x000D
+/** Authenticated decryption failed. */
+#define MBEDTLS_ERR_CCM_AUTH_FAILED     -0x000F
+/** CCM functions called in the wrong sequence. */
+#define MBEDTLS_ERR_CCM_BAD_SEQUENCE    -0x0011
 
 #ifdef __cplusplus
 extern "C" {
@@ -75,6 +79,21 @@ extern "C" {
 typedef struct mbedtls_ccm_context
 {
     mbedtls_cipher_context_t MBEDTLS_PRIVATE(cipher_ctx);    /*!< The cipher context used. */
+    unsigned char MBEDTLS_PRIVATE(y)[16];    /*!< The Y working buffer */
+    unsigned char MBEDTLS_PRIVATE(ctr)[16];  /*!< The counter buffer */
+    unsigned char MBEDTLS_PRIVATE(q);        /*!< The Q working value */
+    size_t MBEDTLS_PRIVATE(plaintext_len);   /*!< Total plaintext length */
+    size_t MBEDTLS_PRIVATE(add_len);         /*!< Total authentication data length */
+    size_t MBEDTLS_PRIVATE(tag_len);         /*!< Total tag length */
+    size_t MBEDTLS_PRIVATE(processed);       /*!< How many bytes of input data were processed (chunked input) */
+    int MBEDTLS_PRIVATE(mode);               /*!< The operation to perform:
+                                                #MBEDTLS_CCM_ENCRYPT or
+                                                #MBEDTLS_CCM_DECRYPT or
+                                                #MBEDTLS_CCM_STAR_ENCRYPT or
+                                                #MBEDTLS_CCM_STAR_DECRYPT. */
+    int MBEDTLS_PRIVATE(state);              /*!< Working value holding context's
+                                                  state. Used for chunked data
+                                                  input */
 }
 mbedtls_ccm_context;
 
